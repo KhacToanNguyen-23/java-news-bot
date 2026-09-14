@@ -35,39 +35,50 @@ public class GeminiSummarizer implements AISummarizer {
             return;
         }
 
-        try {
-            String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
+        String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
+                + "{\n"
+                + "  \"summary\": \"Tóm tắt chi tiết, đầy đủ và chuyên sâu nội dung chính của bài viết (trình bày rõ hoàn cảnh, sự kiện chính, các số liệu/dữ liệu quan trọng và kết luận). Viết từ 5 đến 8 câu văn mạch lạc, phân tích kỹ càng. Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
+                + "  \"questions\": [\"Câu hỏi 1\", \"Câu hỏi 2\", \"Câu hỏi 3\"],\n"
+                + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu\"\n"
+                + "}\n"
+                + "Yêu cầu tuyệt đối: Không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
 
-            String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
-                    + "{\n"
-                    + "  \"summary\": \"Tóm tắt chi tiết, đầy đủ và chuyên sâu nội dung chính của bài viết (trình bày rõ hoàn cảnh, sự kiện chính, các số liệu/dữ liệu quan trọng và kết luận). Viết từ 5 đến 8 câu văn mạch lạc, phân tích kỹ càng. Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
-                    + "  \"questions\": [\"Câu hỏi 1\", \"Câu hỏi 2\", \"Câu hỏi 3\"],\n"
-                    + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu\"\n"
-                    + "}\n"
-                    + "Yêu cầu tuyệt đối: Không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
+        String userPrompt = "Tiêu đề: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
 
-            String userPrompt = "Tiêu đề: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
+        String[] modelEndpoints = {
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key="
+        };
 
-            Map<String, Object> requestBody = buildGeminiPayload(systemPrompt, userPrompt);
-            String jsonPayload = objectMapper.writeValueAsString(requestBody);
+        boolean success = false;
+        for (String baseEndpoint : modelEndpoints) {
+            try {
+                String endpoint = baseEndpoint + apiKey;
+                Map<String, Object> requestBody = buildGeminiPayload(systemPrompt, userPrompt);
+                String jsonPayload = objectMapper.writeValueAsString(requestBody);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(endpoint))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                    .timeout(Duration.ofSeconds(20))
-                    .build();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(endpoint))
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+                        .timeout(Duration.ofSeconds(20))
+                        .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() == 200) {
-                parseAndApplyGeminiResponse(item, response.body());
-            } else {
-                logger.warn("Gemini API returned status {}: {}. Using fallback.", response.statusCode(), response.body());
-                applyFallback(item);
+                if (response.statusCode() == 200) {
+                    parseAndApplyGeminiResponse(item, response.body());
+                    success = true;
+                    break;
+                }
+            } catch (Exception e) {
+                logger.debug("Failed endpoint {}: {}", baseEndpoint, e.getMessage());
             }
-        } catch (Exception e) {
-            logger.error("Failed to generate AI summary for article '{}': {}", item.getTitle(), e.getMessage());
+        }
+
+        if (!success) {
+            logger.warn("All Gemini API endpoints failed or returned non-200. Applying fallback for: {}", item.getTitle());
             applyFallback(item);
         }
     }
