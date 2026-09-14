@@ -35,19 +35,19 @@ public class GeminiSummarizer implements AISummarizer {
             return;
         }
 
-        String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích kỹ nội dung bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
+        String systemPrompt = "Bạn là chuyên gia phân tích tin tức hàng đầu. Hãy phân tích kỹ bài báo (dù nguồn bài viết gốc là tiếng Anh hay tiếng Việt) và dịch/viết toàn bộ bản phân tích 100% BẰNG TIẾNG VIỆT. Trả về duy nhất 1 JSON object có cấu trúc:\n"
                 + "{\n"
-                + "  \"summary\": \"Tóm tắt chi tiết, đầy đủ và chuyên sâu nội dung chính của bài viết (từ 5 đến 8 câu, bao gồm bối cảnh, sự kiện, dữ liệu/số liệu và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
+                + "  \"summary\": \"Tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung chính bằng Tiếng Việt (từ 6 đến 10 câu văn mạch lạc, phân tích kỹ càng bối cảnh, diễn biến sự kiện chính, các số liệu/dữ liệu quan trọng và kết luận bài báo). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
                 + "  \"questions\": [\n"
-                + "    \"Câu hỏi 1: Đặt 1 câu hỏi phân tích chuyên sâu bám sát sự kiện chính trong bài báo\",\n"
-                + "    \"Câu hỏi 2: Đặt 1 câu hỏi về tác động/ảnh hưởng trực tiếp của thông tin này đến thị trường hoặc các bên liên quan\",\n"
-                + "    \"Câu hỏi 3: Đặt 1 câu hỏi về thách thức, rủi ro hoặc cơ hội tiếp theo phát sinh từ bài báo\"\n"
+                + "    \"Câu hỏi 1 (bằng Tiếng Việt): Đặt câu hỏi phân tích bám sát sự kiện chính trong bài báo\",\n"
+                + "    \"Câu hỏi 2 (bằng Tiếng Việt): Đặt câu hỏi về tác động trực tiếp của thông tin này đến thị trường\",\n"
+                + "    \"Câu hỏi 3 (bằng Tiếng Việt): Đặt câu hỏi về thách thức hoặc cơ hội tiếp theo\"\n"
                 + "  ],\n"
-                + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu dựa trên bài viết\"\n"
+                + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu bằng Tiếng Việt\"\n"
                 + "}\n"
-                + "Yêu cầu tuyệt đối: Đúng 3 câu hỏi liên quan bám sát bài báo. Tuyệt đối không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
+                + "Yêu cầu tuyệt đối: Toàn bộ phản hồi PHẢI BẰNG TIẾNG VIỆT. Đúng 3 câu hỏi liên quan bám sát bài báo. Tuyệt đối không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
 
-        String userPrompt = "Tiêu đề: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
+        String userPrompt = "Tiêu đề bài báo: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
 
         String[] modelEndpoints = {
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
