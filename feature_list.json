@@ -1,0 +1,62 @@
+[
+  {
+    "id": "US1.1-rss-scraper",
+    "title": "Scrape Reuters & VN News via RSS",
+    "user_visible_behavior": "Collect top tech and economics news from RSS/Web sources on execution",
+    "verification_command": "mvn test -Dtest=RssNewsScraperTest",
+    "status": "passing",
+    "evidence": "Tests: 1 passed, 0 failed (RssNewsScraperTest)",
+    "notes": "Parsed Reuters, VnExpress, CafeF successfully",
+    "priority": "P1"
+  },
+  {
+    "id": "US1.2-telegram-notifier",
+    "title": "Send Telegram formatted notification without icons",
+    "user_visible_behavior": "Receive news formatted with Date, Title, Summary, 3 Questions, Insights, Link without emojis",
+    "verification_command": "mvn test -Dtest=MessageFormatterTest",
+    "status": "passing",
+    "evidence": "Tests: 1 passed, 0 failed (MessageFormatterTest)",
+    "notes": "Strict 6-part format with 4096 character chunking",
+    "priority": "P1"
+  },
+  {
+    "id": "US1.3-config-loader",
+    "title": "Dynamic config.json & env loader",
+    "user_visible_behavior": "Configure schedule & topics via config.json without recompiling",
+    "verification_command": "mvn test -Dtest=ConfigLoaderTest",
+    "status": "passing",
+    "evidence": "Tests: 1 passed, 0 failed (ConfigLoaderTest)",
+    "notes": "Reads classpath & external file config.json",
+    "priority": "P1"
+  },
+  {
+    "id": "US1.4-extensible-notifier",
+    "title": "Extensible NotificationService interface",
+    "user_visible_behavior": "Strategy pattern interface for notification channels",
+    "verification_command": "mvn test-compile",
+    "status": "passing",
+    "evidence": "Compilation passed",
+    "notes": "Strategy pattern implemented for Telegram & future Email",
+    "priority": "P1"
+  },
+  {
+    "id": "US1.5-github-actions-workflow",
+    "title": "GitHub Actions Cron Workflow",
+    "user_visible_behavior": "Execute daily via GitHub Actions schedule without keeping laptop powered on",
+    "verification_command": "mvn clean package",
+    "status": "passing",
+    "evidence": "daily-news.yml created and verified",
+    "notes": "Cron schedule 0 0 * * * UTC (07:00 AM ICT)",
+    "priority": "P1"
+  },
+  {
+    "id": "US2.1-gemini-ai-summary",
+    "title": "Gemini AI Analytical Prompting & Questions",
+    "user_visible_behavior": "Generate 3 analytical questions and future insights for each article using Gemini API",
+    "verification_command": "mvn test -Dtest=GeminiSummarizerTest",
+    "status": "passing",
+    "evidence": "Tests: 1 passed, 0 failed (GeminiSummarizerTest)",
+    "notes": "Gemini 1.5 Flash integration with fallback",
+    "priority": "P2"
+  }
+]
