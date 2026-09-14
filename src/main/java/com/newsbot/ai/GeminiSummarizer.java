@@ -35,13 +35,17 @@ public class GeminiSummarizer implements AISummarizer {
             return;
         }
 
-        String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
+        String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích kỹ nội dung bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                 + "{\n"
-                + "  \"summary\": \"Tóm tắt chi tiết, đầy đủ và chuyên sâu nội dung chính của bài viết (trình bày rõ hoàn cảnh, sự kiện chính, các số liệu/dữ liệu quan trọng và kết luận). Viết từ 5 đến 8 câu văn mạch lạc, phân tích kỹ càng. Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
-                + "  \"questions\": [\"Câu hỏi 1\", \"Câu hỏi 2\", \"Câu hỏi 3\"],\n"
-                + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu\"\n"
+                + "  \"summary\": \"Tóm tắt chi tiết, đầy đủ và chuyên sâu nội dung chính của bài viết (từ 5 đến 8 câu, bao gồm bối cảnh, sự kiện, dữ liệu/số liệu và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
+                + "  \"questions\": [\n"
+                + "    \"Câu hỏi 1: Đặt 1 câu hỏi phân tích chuyên sâu bám sát sự kiện chính trong bài báo\",\n"
+                + "    \"Câu hỏi 2: Đặt 1 câu hỏi về tác động/ảnh hưởng trực tiếp của thông tin này đến thị trường hoặc các bên liên quan\",\n"
+                + "    \"Câu hỏi 3: Đặt 1 câu hỏi về thách thức, rủi ro hoặc cơ hội tiếp theo phát sinh từ bài báo\"\n"
+                + "  ],\n"
+                + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu dựa trên bài viết\"\n"
                 + "}\n"
-                + "Yêu cầu tuyệt đối: Không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
+                + "Yêu cầu tuyệt đối: Đúng 3 câu hỏi liên quan bám sát bài báo. Tuyệt đối không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
 
         String userPrompt = "Tiêu đề: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
 
@@ -148,9 +152,9 @@ public class GeminiSummarizer implements AISummarizer {
         }
         if (item.getQuestions() == null || item.getQuestions().isEmpty()) {
             List<String> q = new ArrayList<>();
-            q.add("Bài viết này tác động thế nào đến góc nhìn ngành " + item.getCategory() + "?");
-            q.add("Cần theo dõi thêm những thông số hoặc sự kiện gì tiếp theo?");
-            q.add("Những giải pháp thay thế khả thi cho xu hướng này là gì?");
+            q.add("Sự kiện trong bài báo '" + item.getTitle() + "' tác động trực tiếp thế nào đến ngành " + item.getCategory() + "?");
+            q.add("Những rủi ro và thách thức chính mà các bên liên quan sẽ gặp phải sau thông tin này là gì?");
+            q.add("Thị trường và người dùng cuối nên chuẩn bị những giải pháp ứng phó nào?");
             item.setQuestions(q);
         }
         if (item.getInsights() == null || item.getInsights().isEmpty()) {
