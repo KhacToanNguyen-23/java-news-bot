@@ -36,8 +36,8 @@ public class GeminiSummarizer implements AISummarizer {
         }
 
         try {
-            // Using official Gemini 1.5 Flash endpoint
-            String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+            // Using official gemini-1.5-flash-latest endpoint
+            String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
 
             String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                     + "{\n"
