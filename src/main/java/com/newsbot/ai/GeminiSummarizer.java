@@ -36,18 +36,17 @@ public class GeminiSummarizer implements AISummarizer {
         }
 
         try {
-            // Using official gemini-1.5-flash-latest endpoint
             String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
 
             String systemPrompt = "Bạn là chuyên gia phân tích tin tức. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                     + "{\n"
-                    + "  \"summary\": \"Tóm tắt nội dung chính bằng tiếng Việt (2-3 câu)\",\n"
+                    + "  \"summary\": \"Tóm tắt chi tiết, đầy đủ và chuyên sâu nội dung chính của bài viết (trình bày rõ hoàn cảnh, sự kiện chính, các số liệu/dữ liệu quan trọng và kết luận). Viết từ 5 đến 8 câu văn mạch lạc, phân tích kỹ càng. Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
                     + "  \"questions\": [\"Câu hỏi 1\", \"Câu hỏi 2\", \"Câu hỏi 3\"],\n"
-                    + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai\"\n"
+                    + "  \"insights\": \"Nhận định & dự đoán xu hướng tương lai chuyên sâu\"\n"
                     + "}\n"
-                    + "Yêu cầu tuyệt đối: Không dùng bất kỳ icon hay emoji nào trong câu chữ.";
+                    + "Yêu cầu tuyệt đối: Không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
 
-            String userPrompt = "Tiêu đề: " + item.getTitle() + "\nNội dung: " + item.getSnippet();
+            String userPrompt = "Tiêu đề: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
 
             Map<String, Object> requestBody = buildGeminiPayload(systemPrompt, userPrompt);
             String jsonPayload = objectMapper.writeValueAsString(requestBody);
