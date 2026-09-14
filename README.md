@@ -1,50 +1,72 @@
-# Java Daily News Aggregator & Telegram Bot
+# 📰 java-news-bot
 
-Công cụ tự động hóa cá nhân bằng **Java 17** giúp cào tin tức công nghệ và kinh tế hàng ngày từ các nguồn hàng đầu (Reuters, VnExpress, CafeF), tự động phân tích và tóm tắt bài báo bằng **Google Gemini AI**, sau đó gửi bản tin về **Telegram Bot** vào khung giờ cố định.
+> **A personal automation tool for news lovers who are way too lazy to scroll.**
 
-Ứng dụng chạy hoàn toàn miễn phí, không tốn tài nguyên máy tính cá nhân thông qua **GitHub Actions Scheduled Workflows**.
+I love keeping up with Tech & Economics news, but opening 10 different tabs every morning? Nah, too lazy for that. 
+
+So I built this lightweight Java tool to do the heavy lifting for me. It automatically scrapes top headlines, gets Google Gemini AI to digest them into analytical insights (no fluff, no emojis, just pure substance), and drops a neat morning report straight into my Telegram—all for **$0** using GitHub Actions while my laptop is fast asleep. 😴⚡
 
 ---
 
-## 📌 Định dạng bản tin (Strict Analytical Format - No Icon)
+## 💡 What it actually does
 
-Mỗi bài báo được phân tích theo 6 phần cố định:
+Every morning at **07:00 AM (UTC+7)**, this bot:
+
+1. **Scrapes the good stuff**: Grabs top Tech & Economics headlines from **Reuters**, **VnExpress**, and **CafeF**.
+2. **Asks Gemini AI to do the thinking**:
+   - Summarizes the core story in 2-3 sentences.
+   - Generates **3 analytical questions** you should be asking about the topic.
+   - Provides a **forward-looking prediction/insight** on where the market or tech is heading.
+3. **Pushes to Telegram**: Sends a clean, no-emoji markdown report straight to your phone.
+4. **Goes back to sleep**: Powered by GitHub Actions cron—no 24/7 server or running PC required!
+
+---
+
+## 📋 The No-Emoji Analytical Format
+
+No flashy icons. No clutter. Just raw analytical digest:
 
 ```text
-Ngày tháng: [DD/MM/YYYY HH:mm]
-Tiêu đề: [Tiêu đề bài viết]
-Tóm tắt: [Tóm tắt nội dung chính bằng tiếng Việt]
+Ngày tháng: 14/09/2026 07:00
+Tiêu đề: Apple unveils M5 chip focused on local AI workloads
+
+Tóm tắt: Apple announced its next-gen M5 chip equipped with a 64-core NPU, enabling on-device execution of large language models without internet connectivity. It consumes 40% less power and doubles machine learning performance compared to the M4.
+
 Câu hỏi liên quan:
-1. [Câu hỏi phân tích 1]
-2. [Câu hỏi phân tích 2]
-3. [Câu hỏi phân tích 3]
-Nhận định & Dự đoán: [Góc nhìn chuyên sâu và dự đoán xu hướng tương lai]
-Link bài viết: [URL bài báo gốc]
+1. How will on-device AI impact Apple's user data privacy policies?
+2. How will competitors like Qualcomm or Samsung adjust their mobile chip strategies?
+3. Will higher M5 manufacturing costs drive up starting prices for future MacBooks?
+
+Nhận định & Dự đoán: This move signals a shift from Cloud AI to Edge AI on personal devices. Over the next 1-2 years, mobile apps will integrate deeper local AI features, triggering a new hardware upgrade cycle.
+
+Link bài viết: https://reuters.com/technology/apple-m5-chip-announcement-2026
 ```
 
 ---
 
-## 🛠️ Hướng dẫn cài đặt & Cấu hình GitHub Actions
+## ⚡ 1-Minute Setup Guide
 
-### 1. Đưa dự án lên Repository GitHub
-Đẩy toàn bộ mã nguồn dự án lên một Repository (Public hoặc Private) trên GitHub của bạn.
+### 1. Fork or Clone this Repo
+Push it to your personal GitHub account.
 
-### 2. Cấu hình GitHub Repository Secrets
-Trên GitHub, truy cập: **Settings** -> **Secrets and variables** -> **Actions** -> Bấm **New repository secret** và thêm 3 bí mật:
+### 2. Add Secrets to GitHub
+Go to **Settings** ➔ **Secrets and variables** ➔ **Actions** ➔ Click **New repository secret** and add:
 
-1. `TELEGRAM_BOT_TOKEN`: Token của Telegram Bot tạo từ `@BotFather`.
-2. `TELEGRAM_CHAT_ID`: ID tài khoản Telegram cá nhân (lấy qua `@userinfobot`).
-3. `GEMINI_API_KEY`: API Key lấy từ [Google AI Studio](https://aistudio.google.com/).
+| Secret Name | Where to get it |
+| :--- | :--- |
+| `TELEGRAM_BOT_TOKEN` | Talk to [@BotFather](https://t.me/BotFather) on Telegram |
+| `TELEGRAM_CHAT_ID` | Get your ID from [@userinfobot](https://t.me/userinfobot) |
+| `GEMINI_API_KEY` | Grab a free key from [Google AI Studio](https://aistudio.google.com/) |
 
-### 3. Tùy chỉnh lịch chạy hoặc chạy tức thì
-- **Tự động:** GitHub Actions sẽ tự chạy vào **07:00 AM** (UTC+7) mỗi ngày theo cấu hình trong `.github/workflows/daily-news.yml`.
-- **Chạy tức thì (On-Demand):** Mở tab **Actions** trên GitHub ➔ Chọn workflow **Daily News Aggregator Bot** ➔ Bấm nút **Run workflow**.
+### 3. Sit back & enjoy
+- **Automatic**: Runs every morning at 7:00 AM.
+- **Manual**: Go to **Actions** tab ➔ Click **Daily News Aggregator Bot** ➔ Hit **Run workflow** anytime you want news right now!
 
 ---
 
-## ⚙️ Tùy chỉnh nguồn báo (`config.json`)
+## 🛠️ Customizing News Sources (`config.json`)
 
-Bạn có thể chỉnh sửa file `config.json` trực tiếp trên web GitHub mà không cần sửa code:
+Want different sources? Just edit `config.json` directly on GitHub:
 
 ```json
 {
@@ -73,15 +95,19 @@ Bạn có thể chỉnh sửa file `config.json` trực tiếp trên web GitHub 
 
 ---
 
-## 💻 Chạy cục bộ (Local Development)
+## 💻 Local Testing
 
 ```bash
-# Biên dịch và chạy toàn bộ unit tests
+# Run unit tests
 mvn clean test
 
-# Đóng gói Fat JAR
+# Build executable Fat JAR
 mvn clean package
 
-# Chạy ứng dụng (Đặt biến môi trường nếu có)
+# Run locally
 java -jar target/java-news-bot-1.0.0.jar
 ```
+
+---
+
+*Built with Java 17, ROME RSS, Jsoup, Jackson, Gemini 1.5 Flash API, and GitHub Actions.* ☕
