@@ -35,6 +35,9 @@ public class GeminiSummarizer implements AISummarizer {
             return;
         }
 
+        String cleanKey = apiKey.trim().replaceAll("^\"|\"$", "");
+        logger.info("Using cleaned Gemini API Key length: {}", cleanKey.length());
+
         boolean isInternational = item.getSourceName().toLowerCase().contains("reuters")
                 || item.getSourceName().toLowerCase().contains("techcrunch")
                 || item.getCategory().toLowerCase().contains("international");
@@ -56,17 +59,16 @@ public class GeminiSummarizer implements AISummarizer {
         String userPrompt = "Nguồn tin: " + item.getSourceName() + "\nTiêu đề: " + item.getTitle() + "\nNội dung: " + item.getSnippet();
 
         String[] modelEndpoints = {
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key="
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
         };
 
         boolean success = false;
         for (String baseEndpoint : modelEndpoints) {
             try {
-                String endpoint = baseEndpoint + apiKey;
+                String endpoint = baseEndpoint + cleanKey;
                 Map<String, Object> requestBody = buildGeminiPayload(systemPrompt, userPrompt);
                 String jsonPayload = objectMapper.writeValueAsString(requestBody);
 
