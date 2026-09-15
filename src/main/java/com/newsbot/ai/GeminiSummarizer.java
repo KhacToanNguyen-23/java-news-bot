@@ -35,29 +35,26 @@ public class GeminiSummarizer implements AISummarizer {
             return;
         }
 
-        boolean isInternational = item.getSourceName().toLowerCase().contains("reuters")
-                || item.getSourceName().toLowerCase().contains("techcrunch")
-                || item.getCategory().toLowerCase().contains("international");
-
-        String systemPrompt = "Bạn là chuyên gia phân tích tin tức hàng đầu. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
+        String systemPrompt = "Bạn là một chuyên gia phân tích tin tức hàng đầu. Hãy phân tích kỹ bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                 + "{\n"
                 + "  \"title_vn\": \"Dịch tiêu đề bài báo sang Tiếng Việt mượt mà\",\n"
-                + "  \"summary\": \"Tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung bài viết BẰNG TIẾNG VIỆT 100% (từ 8 đến 12 câu văn mạch lạc, phân tích bối cảnh, sự kiện chính, số liệu quan trọng và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
-                + (isInternational ? "  \"english_summary\": \"A detailed English summary of the article (8 to 12 sentences covering context, key figures, and core events). Strictly no emojis.\",\n" : "")
+                + "  \"summary_vn\": \"Bản tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung bài viết BẰNG TIẾNG VIỆT (từ 8 đến 12 câu văn mạch lạc, phân tích kỹ bối cảnh, sự kiện chính, số liệu quan trọng và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
+                + "  \"summary_en\": \"A comprehensive and detailed English summary of the article (8 to 12 sentences covering context, key events, data, and core conclusions). Strictly no emojis or icons.\",\n"
                 + "  \"questions\": [\n"
                 + "    \"Câu hỏi 1 (bằng Tiếng Việt): Đặt câu hỏi phân tích bám sát sự kiện chính trong bài báo\",\n"
                 + "    \"Câu hỏi 2 (bằng Tiếng Việt): Đặt câu hỏi về tác động trực tiếp của thông tin này đến thị trường\",\n"
                 + "    \"Câu hỏi 3 (bằng Tiếng Việt): Đặt câu hỏi về thách thức hoặc cơ hội tiếp theo\"\n"
                 + "  ],\n"
-                + "  \"insights\": \"Nhận định và dự đoán xu hướng tương lai chuyên sâu bằng Tiếng Việt\"\n"
+                + "  \"insights\": \"Nhận định chuyên môn và dự đoán xu hướng tương lai chuyên sâu bằng Tiếng Việt\"\n"
                 + "}\n"
-                + "Yêu cầu tuyệt đối: Toàn bộ phần summary, title_vn, questions và insights PHẢI BẰNG TIẾNG VIỆT. Tuyệt đối không dùng bất kỳ icon hay emoji nào.";
+                + "Yêu cầu tuyệt đối: Trả về đúng JSON. Tuyệt đối không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
 
         String userPrompt = "Nguồn tin: " + item.getSourceName() + "\nTiêu đề: " + item.getTitle() + "\nNội dung: " + item.getSnippet();
 
         String[] modelEndpoints = {
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key="
         };
 
@@ -79,6 +76,7 @@ public class GeminiSummarizer implements AISummarizer {
 
                 if (response.statusCode() == 200) {
                     parseAndApplyGeminiResponse(item, response.body());
+                    logger.info("Successfully generated Gemini AI summary for: {}", item.getTitle());
                     success = true;
                     break;
                 } else {
@@ -129,15 +127,21 @@ public class GeminiSummarizer implements AISummarizer {
 
                 String titleVn = aiJson.path("title_vn").asText("");
                 if (titleVn != null && !titleVn.trim().isEmpty()) {
-                    item.setTitleVn(titleVn);
+                    item.setTitleVn(titleVn.trim());
                 }
 
-                String summary = aiJson.path("summary").asText(item.getSnippet());
-                item.setSummary(summary);
+                String summaryVn = aiJson.path("summary_vn").asText(item.getSnippet());
+                if (summaryVn == null || summaryVn.trim().isEmpty()) {
+                    summaryVn = aiJson.path("summary").asText(item.getSnippet());
+                }
+                item.setSummary(summaryVn.trim());
 
-                String engSummary = aiJson.path("english_summary").asText("");
+                String engSummary = aiJson.path("summary_en").asText("");
+                if (engSummary == null || engSummary.trim().isEmpty()) {
+                    engSummary = aiJson.path("english_summary").asText("");
+                }
                 if (engSummary != null && !engSummary.trim().isEmpty()) {
-                    item.setEnglishSummary(engSummary);
+                    item.setEnglishSummary(engSummary.trim());
                 }
 
                 List<String> questions = new ArrayList<>();
@@ -153,7 +157,7 @@ public class GeminiSummarizer implements AISummarizer {
 
                 String insights = aiJson.path("insights").asText();
                 if (insights != null && !insights.trim().isEmpty()) {
-                    item.setInsights(insights);
+                    item.setInsights(insights.trim());
                 }
             } else {
                 applyFallback(item);

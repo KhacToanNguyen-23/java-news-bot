@@ -13,7 +13,7 @@ public class NewsItem {
     private String pubDate;
 
     // Processed analytical fields
-    private String summary;          // 100% Vietnamese detailed summary
+    private String summary;          // Detailed Vietnamese summary
     private String englishSummary;   // Detailed English summary
     private List<String> questions = new ArrayList<>();
     private String insights;

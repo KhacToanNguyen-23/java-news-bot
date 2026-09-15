@@ -2,7 +2,9 @@ package com.newsbot.notifier;
 
 import com.newsbot.model.NewsItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MessageFormatter {
@@ -13,6 +15,15 @@ public class MessageFormatter {
             messages.add("Khong co tin tuc moi trong 24h qua.");
             return messages;
         }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        String currentDateStr = sdf.format(new Date());
+
+        // Header Message (Message Ranh Giới Sặc Sỡ / Phân Biệt Đợt Báo Mỗi Ngày)
+        String headerBanner = "==================================================\n"
+                + "BẢN TIN BÁO MỚI TỔNG HỢP - NGÀY " + currentDateStr + "\n"
+                + "==================================================";
+        messages.add(headerBanner);
 
         StringBuilder sb = new StringBuilder();
         int maxCharLimit = 3800; // Telegram max is 4096, leave safety margin
@@ -51,17 +62,16 @@ public class MessageFormatter {
         } else {
             sb.append("Tiêu đề: ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
         }
-        
-        String summary = item.getSummary();
-        if (summary == null || summary.trim().isEmpty()) {
-            summary = item.getSnippet();
+
+        String summaryVn = item.getSummary();
+        if (summaryVn == null || summaryVn.trim().isEmpty()) {
+            summaryVn = item.getSnippet();
         }
 
+        sb.append("\nTóm tắt Chi Tiết (Tiếng Việt):\n").append(summaryVn.trim()).append("\n");
+
         if (item.getEnglishSummary() != null && !item.getEnglishSummary().trim().isEmpty()) {
-            sb.append("\nTóm tắt (Tiếng Việt):\n").append(summary).append("\n\n");
-            sb.append("Summary (English):\n").append(item.getEnglishSummary().trim()).append("\n");
-        } else {
-            sb.append("\nTóm tắt (Tiếng Việt):\n").append(summary).append("\n");
+            sb.append("\nSummary (English):\n").append(item.getEnglishSummary().trim()).append("\n");
         }
 
         sb.append("\nCâu hỏi liên quan:\n");
@@ -71,7 +81,7 @@ public class MessageFormatter {
                 sb.append((i + 1)).append(". ").append(questions.get(i)).append("\n");
             }
         } else {
-            sb.append("1. Bài viết này tác động thế nào đến ngành ").append(item.getCategory() != null ? item.getCategory() : "công nghệ").append("?\n");
+            sb.append("1. Sự kiện trong bài báo tác động thế nào đến ngành ").append(item.getCategory() != null ? item.getCategory() : "công nghệ").append("?\n");
             sb.append("2. Xu hướng này có khả năng ảnh hưởng ra sao tới thị trường Việt Nam?\n");
             sb.append("3. Những thách thức chính mà các bên liên quan phải đối mặt là gì?\n");
         }
@@ -80,7 +90,7 @@ public class MessageFormatter {
         if (insights == null || insights.trim().isEmpty()) {
             insights = "Tin tức phản ánh xu hướng phát triển nổi bật trong ngành " + (item.getCategory() != null ? item.getCategory() : "công nghệ") + ". Cần tiếp tục quan sát diễn biến thực tế.";
         }
-        sb.append("\nNhận định & Dự đoán: ").append(insights).append("\n");
+        sb.append("\nNhận định chuyên môn:\n").append(insights.trim()).append("\n");
         sb.append("Link bài viết: ").append(item.getLink() != null ? item.getLink() : "").append("\n");
 
         return sb.toString();
