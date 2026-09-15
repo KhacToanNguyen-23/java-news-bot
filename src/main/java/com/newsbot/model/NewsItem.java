@@ -5,6 +5,7 @@ import java.util.List;
 
 public class NewsItem {
     private String title;
+    private String titleVn;          // Translated Vietnamese Title
     private String link;
     private String snippet;
     private String sourceName;
@@ -12,8 +13,8 @@ public class NewsItem {
     private String pubDate;
 
     // Processed analytical fields
-    private String summary;          // Vietnamese summary
-    private String englishSummary;   // English summary (for foreign/international news)
+    private String summary;          // 100% Vietnamese detailed summary
+    private String englishSummary;   // Detailed English summary
     private List<String> questions = new ArrayList<>();
     private String insights;
 
@@ -35,6 +36,14 @@ public class NewsItem {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getTitleVn() {
+        return titleVn;
+    }
+
+    public void setTitleVn(String titleVn) {
+        this.titleVn = titleVn;
     }
 
     public String getLink() {

@@ -39,10 +39,11 @@ public class GeminiSummarizer implements AISummarizer {
                 || item.getSourceName().toLowerCase().contains("techcrunch")
                 || item.getCategory().toLowerCase().contains("international");
 
-        String systemPrompt = "Bạn là chuyên gia phân tích tin tức hàng đầu. Hãy phân tích kỹ bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
+        String systemPrompt = "Bạn là chuyên gia phân tích tin tức hàng đầu. Hãy phân tích bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                 + "{\n"
-                + "  \"summary\": \"Bản tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung bài viết bằng Tiếng Việt (từ 8 đến 12 câu văn mạch lạc, phân tích kỹ bối cảnh lịch sử/thị trường, diễn biến sự kiện chính, các số liệu/dữ liệu quan trọng, và kết luận cốt lõi). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
-                + (isInternational ? "  \"english_summary\": \"A comprehensive and highly detailed English summary of the article (8 to 12 sentences covering background context, main events, key data/figures, and core implications). Strictly no emojis or icons.\",\n" : "")
+                + "  \"title_vn\": \"Dịch tiêu đề bài báo sang Tiếng Việt mượt mà\",\n"
+                + "  \"summary\": \"Tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung bài viết BẰNG TIẾNG VIỆT 100% (từ 8 đến 12 câu văn mạch lạc, phân tích bối cảnh, sự kiện chính, số liệu quan trọng và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
+                + (isInternational ? "  \"english_summary\": \"A detailed English summary of the article (8 to 12 sentences covering context, key figures, and core events). Strictly no emojis.\",\n" : "")
                 + "  \"questions\": [\n"
                 + "    \"Câu hỏi 1 (bằng Tiếng Việt): Đặt câu hỏi phân tích bám sát sự kiện chính trong bài báo\",\n"
                 + "    \"Câu hỏi 2 (bằng Tiếng Việt): Đặt câu hỏi về tác động trực tiếp của thông tin này đến thị trường\",\n"
@@ -50,14 +51,14 @@ public class GeminiSummarizer implements AISummarizer {
                 + "  ],\n"
                 + "  \"insights\": \"Nhận định và dự đoán xu hướng tương lai chuyên sâu bằng Tiếng Việt\"\n"
                 + "}\n"
-                + "Yêu cầu tuyệt đối: Đúng 3 câu hỏi liên quan bám sát bài báo. Tuyệt đối không dùng bất kỳ icon hay emoji nào trong toàn bộ văn bản.";
+                + "Yêu cầu tuyệt đối: Toàn bộ phần summary, title_vn, questions và insights PHẢI BẰNG TIẾNG VIỆT. Tuyệt đối không dùng bất kỳ icon hay emoji nào.";
 
-        String userPrompt = "Nguồn tin: " + item.getSourceName() + "\nTiêu đề bài báo: " + item.getTitle() + "\nNội dung bài viết: " + item.getSnippet();
+        String userPrompt = "Nguồn tin: " + item.getSourceName() + "\nTiêu đề: " + item.getTitle() + "\nNội dung: " + item.getSnippet();
 
         String[] modelEndpoints = {
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key="
+                "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key="
         };
 
         boolean success = false;
@@ -80,9 +81,11 @@ public class GeminiSummarizer implements AISummarizer {
                     parseAndApplyGeminiResponse(item, response.body());
                     success = true;
                     break;
+                } else {
+                    logger.warn("Endpoint {} failed with HTTP status {}: {}", baseEndpoint, response.statusCode(), response.body());
                 }
             } catch (Exception e) {
-                logger.debug("Failed endpoint {}: {}", baseEndpoint, e.getMessage());
+                logger.warn("Failed endpoint {}: {}", baseEndpoint, e.getMessage());
             }
         }
 
@@ -123,6 +126,11 @@ public class GeminiSummarizer implements AISummarizer {
             if (candidates.isArray() && candidates.size() > 0) {
                 String rawText = candidates.get(0).path("content").path("parts").get(0).path("text").asText();
                 JsonNode aiJson = objectMapper.readTree(rawText);
+
+                String titleVn = aiJson.path("title_vn").asText("");
+                if (titleVn != null && !titleVn.trim().isEmpty()) {
+                    item.setTitleVn(titleVn);
+                }
 
                 String summary = aiJson.path("summary").asText(item.getSnippet());
                 item.setSummary(summary);

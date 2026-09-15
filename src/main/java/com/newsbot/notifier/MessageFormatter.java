@@ -43,8 +43,14 @@ public class MessageFormatter {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Ngày tháng: ").append(item.getPubDate() != null ? item.getPubDate() : "N/A").append("\n");
-        sb.append("Tiêu đề: ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
         sb.append("Nguồn tin: ").append(item.getSourceName() != null ? item.getSourceName() : "").append("\n");
+
+        if (item.getTitleVn() != null && !item.getTitleVn().trim().isEmpty()) {
+            sb.append("Tiêu đề (Tiếng Việt): ").append(item.getTitleVn().trim()).append("\n");
+            sb.append("Original Title (English): ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
+        } else {
+            sb.append("Tiêu đề: ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
+        }
         
         String summary = item.getSummary();
         if (summary == null || summary.trim().isEmpty()) {
@@ -52,10 +58,10 @@ public class MessageFormatter {
         }
 
         if (item.getEnglishSummary() != null && !item.getEnglishSummary().trim().isEmpty()) {
-            sb.append("Tóm tắt (Tiếng Việt): ").append(summary).append("\n\n");
-            sb.append("Summary (English): ").append(item.getEnglishSummary().trim()).append("\n");
+            sb.append("\nTóm tắt (Tiếng Việt):\n").append(summary).append("\n\n");
+            sb.append("Summary (English):\n").append(item.getEnglishSummary().trim()).append("\n");
         } else {
-            sb.append("Tóm tắt: ").append(summary).append("\n");
+            sb.append("\nTóm tắt (Tiếng Việt):\n").append(summary).append("\n");
         }
 
         sb.append("\nCâu hỏi liên quan:\n");
