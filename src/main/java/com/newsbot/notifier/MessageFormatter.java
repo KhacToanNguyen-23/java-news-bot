@@ -10,7 +10,7 @@ public class MessageFormatter {
     public static List<String> formatNewsReport(List<NewsItem> items) {
         List<String> messages = new ArrayList<>();
         if (items == null || items.isEmpty()) {
-            messages.add("Khong co tin tuc moi.");
+            messages.add("Khong co tin tuc moi trong 24h qua.");
             return messages;
         }
 
@@ -44,14 +44,21 @@ public class MessageFormatter {
 
         sb.append("Ngày tháng: ").append(item.getPubDate() != null ? item.getPubDate() : "N/A").append("\n");
         sb.append("Tiêu đề: ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
+        sb.append("Nguồn tin: ").append(item.getSourceName() != null ? item.getSourceName() : "").append("\n");
         
         String summary = item.getSummary();
         if (summary == null || summary.trim().isEmpty()) {
             summary = item.getSnippet();
         }
-        sb.append("Tóm tắt: ").append(summary != null ? summary : "").append("\n");
 
-        sb.append("Câu hỏi liên quan:\n");
+        if (item.getEnglishSummary() != null && !item.getEnglishSummary().trim().isEmpty()) {
+            sb.append("Tóm tắt (Tiếng Việt): ").append(summary).append("\n\n");
+            sb.append("Summary (English): ").append(item.getEnglishSummary().trim()).append("\n");
+        } else {
+            sb.append("Tóm tắt: ").append(summary).append("\n");
+        }
+
+        sb.append("\nCâu hỏi liên quan:\n");
         List<String> questions = item.getQuestions();
         if (questions != null && !questions.isEmpty()) {
             for (int i = 0; i < questions.size(); i++) {
@@ -65,9 +72,9 @@ public class MessageFormatter {
 
         String insights = item.getInsights();
         if (insights == null || insights.trim().isEmpty()) {
-            insights = "Tin tức cho thấy đà phát triển tiếp diễn trong lĩnh vực " + (item.getCategory() != null ? item.getCategory() : "công nghệ") + ". Cần tiếp tục theo dõi các động thái kế tiếp.";
+            insights = "Tin tức phản ánh xu hướng phát triển nổi bật trong ngành " + (item.getCategory() != null ? item.getCategory() : "công nghệ") + ". Cần tiếp tục quan sát diễn biến thực tế.";
         }
-        sb.append("Nhận định & Dự đoán: ").append(insights).append("\n");
+        sb.append("\nNhận định & Dự đoán: ").append(insights).append("\n");
         sb.append("Link bài viết: ").append(item.getLink() != null ? item.getLink() : "").append("\n");
 
         return sb.toString();

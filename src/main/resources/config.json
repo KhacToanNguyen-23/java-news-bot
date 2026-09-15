@@ -1,20 +1,25 @@
 {
   "scheduleCron": "0 0 7 * * *",
-  "maxArticlesPerSource": 3,
+  "maxArticlesPerSource": 2,
   "enableAiSummary": true,
   "sources": [
     {
-      "name": "Reuters Tech",
-      "url": "https://news.google.com/rss/search?q=site:reuters.com+technology&hl=en-US&gl=US&ceid=US:en",
-      "category": "Technology"
+      "name": "Reuters World & Tech",
+      "url": "https://news.google.com/rss/search?q=site:reuters.com+when:24h&hl=en-US&gl=US&ceid=US:en",
+      "category": "Technology & Economics (International)"
     },
     {
-      "name": "VnExpress Số Hóa",
-      "url": "https://vnexpress.net/rss/so-hoa.rss",
-      "category": "Technology"
+      "name": "TechCrunch",
+      "url": "https://techcrunch.com/feed/",
+      "category": "Technology (International)"
     },
     {
-      "name": "CafeF Thời sự",
+      "name": "VnExpress Tin Mới Nhất",
+      "url": "https://vnexpress.net/rss/tin-moi-nhat.rss",
+      "category": "Technology & Economics"
+    },
+    {
+      "name": "CafeF Thời Sự",
       "url": "https://cafef.net/rss/thoi-su.rss",
       "category": "Economics"
     }

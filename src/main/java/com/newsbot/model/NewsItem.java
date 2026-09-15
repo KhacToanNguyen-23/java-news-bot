@@ -12,7 +12,8 @@ public class NewsItem {
     private String pubDate;
 
     // Processed analytical fields
-    private String summary;
+    private String summary;          // Vietnamese summary
+    private String englishSummary;   // English summary (for foreign/international news)
     private List<String> questions = new ArrayList<>();
     private String insights;
 
@@ -82,6 +83,14 @@ public class NewsItem {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getEnglishSummary() {
+        return englishSummary;
+    }
+
+    public void setEnglishSummary(String englishSummary) {
+        this.englishSummary = englishSummary;
     }
 
     public List<String> getQuestions() {
