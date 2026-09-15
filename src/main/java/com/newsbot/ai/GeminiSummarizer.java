@@ -35,10 +35,14 @@ public class GeminiSummarizer implements AISummarizer {
             return;
         }
 
-        String systemPrompt = "Bạn là một chuyên gia phân tích tin tức hàng đầu. Hãy phân tích kỹ bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
+        boolean isInternational = item.getSourceName().toLowerCase().contains("reuters")
+                || item.getSourceName().toLowerCase().contains("techcrunch")
+                || item.getCategory().toLowerCase().contains("international");
+
+        String systemPrompt = "Bạn là chuyên gia phân tích tin tức hàng đầu. Hãy phân tích kỹ bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                 + "{\n"
                 + "  \"title_vn\": \"Dịch tiêu đề bài báo sang Tiếng Việt mượt mà\",\n"
-                + "  \"summary_vn\": \"Bản tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung bài viết BẰNG TIẾNG VIỆT (từ 8 đến 12 câu văn mạch lạc, phân tích kỹ bối cảnh, sự kiện chính, số liệu quan trọng và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
+                + "  \"summary_vn\": \"Bản tóm tắt cực kỳ chi tiết, đầy đủ và chuyên sâu nội dung bài viết BẰNG TIẾNG VIỆT 100% (từ 8 đến 12 câu văn mạch lạc, phân tích bối cảnh, sự kiện chính, số liệu quan trọng và kết luận). Tuyệt đối không dùng bất kỳ icon hay emoji nào.\",\n"
                 + "  \"summary_en\": \"A comprehensive and detailed English summary of the article (8 to 12 sentences covering context, key events, data, and core conclusions). Strictly no emojis or icons.\",\n"
                 + "  \"questions\": [\n"
                 + "    \"Câu hỏi 1 (bằng Tiếng Việt): Đặt câu hỏi phân tích bám sát sự kiện chính trong bài báo\",\n"
@@ -52,10 +56,11 @@ public class GeminiSummarizer implements AISummarizer {
         String userPrompt = "Nguồn tin: " + item.getSourceName() + "\nTiêu đề: " + item.getTitle() + "\nNội dung: " + item.getSnippet();
 
         String[] modelEndpoints = {
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key="
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key="
         };
 
         boolean success = false;
@@ -76,11 +81,11 @@ public class GeminiSummarizer implements AISummarizer {
 
                 if (response.statusCode() == 200) {
                     parseAndApplyGeminiResponse(item, response.body());
-                    logger.info("Successfully generated Gemini AI summary for: {}", item.getTitle());
+                    logger.info("Successfully generated Gemini AI summary via endpoint: {}", baseEndpoint);
                     success = true;
                     break;
                 } else {
-                    logger.warn("Endpoint {} failed with HTTP status {}: {}", baseEndpoint, response.statusCode(), response.body());
+                    logger.warn("Endpoint {} returned status {}: {}", baseEndpoint, response.statusCode(), response.body());
                 }
             } catch (Exception e) {
                 logger.warn("Failed endpoint {}: {}", baseEndpoint, e.getMessage());
