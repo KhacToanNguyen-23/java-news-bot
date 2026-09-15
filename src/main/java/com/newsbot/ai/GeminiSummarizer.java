@@ -36,7 +36,6 @@ public class GeminiSummarizer implements AISummarizer {
         }
 
         String cleanKey = apiKey.trim().replaceAll("^\"|\"$", "");
-        logger.info("Using cleaned Gemini API Key length: {}", cleanKey.length());
 
         String systemPrompt = "Bạn là chuyên gia phân tích tin tức hàng đầu. Hãy phân tích kỹ bài báo và trả về duy nhất 1 JSON object có cấu trúc:\n"
                 + "{\n"
@@ -55,9 +54,10 @@ public class GeminiSummarizer implements AISummarizer {
         String userPrompt = "Nguồn tin: " + item.getSourceName() + "\nTiêu đề: " + item.getTitle() + "\nNội dung: " + item.getSnippet();
 
         String[] modelEndpoints = {
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=",
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key="
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-latest:generateContent?key=",
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key="
         };
 
         boolean success = false;
