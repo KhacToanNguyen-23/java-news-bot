@@ -48,11 +48,17 @@ public class MessageFormatter {
         sb.append("Ngày tháng: ").append(item.getPubDate() != null ? item.getPubDate() : "N/A").append("\n");
         sb.append("Nguồn tin: ").append(item.getSourceName() != null ? item.getSourceName() : "").append("\n");
 
+        // Put English title first, Vietnamese title second
         if (item.getTitleVn() != null && !item.getTitleVn().trim().isEmpty()) {
-            sb.append("Tiêu đề (Tiếng Việt): ").append(item.getTitleVn().trim()).append("\n");
             sb.append("Original Title (English): ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
+            sb.append("Tiêu đề (Tiếng Việt): ").append(item.getTitleVn().trim()).append("\n");
         } else {
             sb.append("Tiêu đề: ").append(item.getTitle() != null ? item.getTitle() : "").append("\n");
+        }
+
+        // Put English summary first, Vietnamese summary second
+        if (item.getEnglishSummary() != null && !item.getEnglishSummary().trim().isEmpty()) {
+            sb.append("\nSummary (English):\n").append(item.getEnglishSummary().trim()).append("\n");
         }
 
         String summaryVn = item.getSummary();
@@ -61,10 +67,6 @@ public class MessageFormatter {
         }
 
         sb.append("\nTóm tắt Chi Tiết (Tiếng Việt):\n").append(summaryVn.trim()).append("\n");
-
-        if (item.getEnglishSummary() != null && !item.getEnglishSummary().trim().isEmpty()) {
-            sb.append("\nSummary (English):\n").append(item.getEnglishSummary().trim()).append("\n");
-        }
 
         sb.append("\nCâu hỏi liên quan:\n");
         List<String> questions = item.getQuestions();
