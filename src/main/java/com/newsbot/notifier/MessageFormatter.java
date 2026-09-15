@@ -19,32 +19,24 @@ public class MessageFormatter {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         String currentDateStr = sdf.format(new Date());
 
-        // Header Message (Message Ranh Giới Sặc Sỡ / Phân Biệt Đợt Báo Mỗi Ngày)
+        // Header Message (Message Ranh Giới Phân Biệt Đợt Báo Mỗi Ngày)
         String headerBanner = "==================================================\n"
                 + "BẢN TIN BÁO MỚI TỔNG HỢP - NGÀY " + currentDateStr + "\n"
                 + "==================================================";
         messages.add(headerBanner);
 
-        StringBuilder sb = new StringBuilder();
-        int maxCharLimit = 3800; // Telegram max is 4096, leave safety margin
-
-        for (int i = 0; i < items.size(); i++) {
-            NewsItem item = items.get(i);
+        // Send EACH article in its own separate Telegram message to guarantee length < 4096 chars
+        for (NewsItem item : items) {
             String formattedItem = formatSingleItem(item);
-
-            if (sb.length() + formattedItem.length() > maxCharLimit && sb.length() > 0) {
-                messages.add(sb.toString().trim());
-                sb = new StringBuilder();
+            if (formattedItem.length() > 3800) {
+                // Split long article into two parts if it exceeds safety limit
+                int splitIndex = formattedItem.lastIndexOf("\n\n", 3500);
+                if (splitIndex == -1) splitIndex = 3500;
+                messages.add(formattedItem.substring(0, splitIndex).trim());
+                messages.add(formattedItem.substring(splitIndex).trim());
+            } else {
+                messages.add(formattedItem.trim());
             }
-
-            sb.append(formattedItem);
-            if (i < items.size() - 1) {
-                sb.append("\n----------------------------------------\n\n");
-            }
-        }
-
-        if (sb.length() > 0) {
-            messages.add(sb.toString().trim());
         }
 
         return messages;
