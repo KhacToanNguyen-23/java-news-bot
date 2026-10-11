@@ -1,109 +1,109 @@
 # 📰 Daily News Telegram Bot (Pet Project)
 
-> **Dự án cá nhân (Pet Project):** Hệ thống tự động thu thập tin tức thời sự & công nghệ hàng ngày, sử dụng Google Gemini AI để tóm tắt, phân tích chuyên sâu (song ngữ Anh - Việt) và tự động gửi báo cáo điểm tin mỗi sáng qua Telegram hoàn toàn miễn phí.
+> **A personal automation tool** that aggregates daily breaking news from global and Vietnamese publishers, analyzes them using **Google Gemini AI** (dual English & Vietnamese summaries, expert insights, and critical questions), and delivers a neat morning briefing straight to Telegram every day at **$0 hosting cost** via GitHub Actions.
 
 ---
 
-## 📸 Thành Quả Thực Tế (Demo)
+## 📸 Showcase & Results (Demo)
 
-Bản tin được gửi trực tiếp về Telegram cá nhân mỗi sáng với thông tin phân tách rõ ràng, có tiêu đề, tóm tắt song ngữ, câu hỏi đào sâu và nhận định xu hướng chuyên môn:
+Each morning, a formatted report is sent directly to Telegram with clean separation, bilingual summaries, analytical questions, and market predictions:
 
-| Bản tin sáng & Tóm tắt báo quốc tế | Nhận định chuyên môn & Link bài báo |
+| Daily Morning Briefing & Bilingual Digest | Expert Insights & Source Article Link |
 | :---: | :---: |
 | <img src="assets/images/telegram-demo-1.png" alt="Telegram Demo 1" width="360"/> | <img src="assets/images/telegram-demo-2.png" alt="Telegram Demo 2" width="360"/> |
 
 ---
 
-## ⚡ Công Nghệ Sử Dụng (Tech Stack)
+## ⚡ Tech Stack
 
-* **Ngôn ngữ & Runtime:** Java 17 (LTS), quản lý dự án bằng **Maven**.
-* **AI Engine:** **Google Gemini API** (`gemini-3.6-flash`) để đọc hiểu, tóm tắt chi tiết 8–12 câu, trích xuất nhận định và đặt câu hỏi phản biện.
-* **Thu thập dữ liệu (Scraper):** 
-  * **ROME Tools** (`rome`): Parse chuẩn các luồng RSS 2.0 / Atom từ VnExpress, CafeF, Reuters, TechCrunch.
-  * **Jsoup**: Làm sạch mã HTML, trích xuất text thuần túy và link gốc.
-* **Xử lý dữ liệu:** **FasterXML Jackson** (`jackson-databind`) đọc/ghi file cấu hình JSON và parse payload AI.
-* **Kênh thông báo:** **Telegram Bot API** (gửi HTTP qua `java.net.http.HttpClient` native của Java).
-* **CI/CD & Serverless Automation:** **GitHub Actions** thiết lập Cron schedule chạy tự động vào mỗi sáng (07:15 AM ICT) không cần treo máy tính hay thuê VPS.
+* **Language & Runtime:** **Java 17 (LTS)** managed with **Apache Maven**.
+* **AI Engine:** **Google Gemini API** (`gemini-3.6-flash`) for deep text analysis, 8–12 sentence analytical summaries, market foresight, and critical question generation.
+* **Web Scraping & RSS:**
+  * **ROME Tools** (`rome`): Standard RSS 2.0 / Atom feed parser for Reuters, TechCrunch, VnExpress, and CafeF.
+  * **Jsoup**: HTML sanitizer and clean snippet extraction.
+* **Data Processing:** **FasterXML Jackson** (`jackson-databind`) for config file loading and Gemini JSON output parsing.
+* **Notification Channel:** **Telegram Bot API** via Java's native asynchronous `HttpClient`.
+* **CI/CD & Serverless Automation:** **GitHub Actions** scheduled cron workflow running daily at 07:15 AM (UTC+7) without requiring any dedicated VPS or running computer.
 
 ---
 
-## 📂 Cấu Trúc Repository
+## 📂 Repository Structure
 
 ```text
 newspaper/
 ├── .github/workflows/
-│   └── daily-news.yml             # Workflow GitHub Actions hẹn giờ chạy mỗi sáng
-├── assets/images/                 # Ảnh chụp màn hình kết quả thực tế trên Telegram
+│   └── daily-news.yml             # GitHub Actions cron scheduler workflow
+├── assets/images/                 # Screenshot demo assets
 │   ├── telegram-demo-1.png
 │   └── telegram-demo-2.png
 ├── src/
 │   ├── main/
 │   │   ├── java/com/newsbot/
-│   │   │   ├── ai/                # Module AI (GeminiSummarizer, AISummarizer)
-│   │   │   ├── config/            # Quản lý cấu hình nguồn tin & lịch trình
-│   │   │   ├── model/             # Data Models (NewsItem, BotConfig)
-│   │   │   ├── notifier/          # Module gửi tin (TelegramNotificationService, MessageFormatter)
-│   │   │   ├── scraper/           # Module cào và lọc tin tức RSS
-│   │   │   └── Main.java          # Entry point điều phối toàn bộ workflow
+│   │   │   ├── ai/                # AI integration (GeminiSummarizer, AISummarizer)
+│   │   │   ├── config/            # Bot and feed configurations
+│   │   │   ├── model/             # Domain models (NewsItem, BotConfig)
+│   │   │   ├── notifier/          # Delivery service (TelegramNotificationService, MessageFormatter)
+│   │   │   ├── scraper/           # RSS fetching and content scraping
+│   │   │   └── Main.java          # Application orchestrator & entry point
 │   │   └── resources/
-│   │       └── config.json        # File cấu hình danh sách nguồn RSS và số lượng bài
-│   └── test/                      # Unit test kiểm thử scraper và formatter
-├── pom.xml                        # Maven dependencies & Shade plugin đóng gói Fat JAR
-└── README.md                      # Tài liệu hướng dẫn dự án
+│   │       └── config.json        # News feeds list and per-source limits
+│   └── test/                      # Unit tests for scraper & message formatting
+├── pom.xml                        # Maven dependencies & Shade plugin for executable Fat JAR
+└── README.md                      # Project documentation
 ```
 
 ---
 
-## ⚙️ Hướng Dẫn Cài Đặt & Sử Dụng
+## ⚙️ Installation & Usage Guide
 
-### 1. Chuẩn Bị Các Khóa API (Môi trường)
-Dự án cần 3 biến môi trường để hoạt động:
-* `TELEGRAM_BOT_TOKEN`: Token của bot Telegram (tạo miễn phí qua [@BotFather](https://t.me/BotFather)).
-* `TELEGRAM_CHAT_ID`: Chat ID nhận tin nhắn (lấy qua [@userinfobot](https://t.me/userinfobot)).
-* `GEMINI_API_KEY`: API Key miễn phí từ [Google AI Studio](https://aistudio.google.com/).
+### 1. Prerequisites & API Credentials
+You need three credentials:
+* `TELEGRAM_BOT_TOKEN`: Create a bot for free via [@BotFather](https://t.me/BotFather).
+* `TELEGRAM_CHAT_ID`: Retrieve your personal chat ID from [@userinfobot](https://t.me/userinfobot).
+* `GEMINI_API_KEY`: Grab a free API key from [Google AI Studio](https://aistudio.google.com/).
 
 ---
 
-### 2. Chạy Thử Ở Máy Local
+### 2. Running Locally
 
-Yêu cầu máy đã cài **JDK 17+** và **Maven**.
+Make sure you have **JDK 17+** and **Maven** installed.
 
 ```bash
-# 1. Clone repository
+# 1. Clone the repository
 git clone https://github.com/KhacToanNguyen-23/java-news-bot.git
 cd java-news-bot
 
-# 2. Thiết lập biến môi trường (Windows PowerShell)
+# 2. Set environment variables (PowerShell)
 $env:TELEGRAM_BOT_TOKEN="your_telegram_bot_token"
 $env:TELEGRAM_CHAT_ID="your_telegram_chat_id"
 $env:GEMINI_API_KEY="your_gemini_api_key"
 
-# 3. Build file Fat JAR
+# 3. Build executable Fat JAR
 mvn clean package -DskipTests
 
-# 4. Khởi chạy bot
+# 4. Run the bot
 java -jar target/java-news-bot-1.0.0.jar
 ```
 
 ---
 
-### 3. Thiết Lập Tự Động Hoàn Toàn Với GitHub Actions (Khuyên Dùng)
+### 3. Fully Automated via GitHub Actions (Recommended)
 
-Bạn không cần mở máy tính hay thuê VPS, GitHub sẽ tự động chạy bot:
+No server or running laptop needed—GitHub handles the daily execution:
 
-1. Fork hoặc Push mã nguồn lên Repository cá nhân trên GitHub.
-2. Vào **Settings** ➔ **Secrets and variables** ➔ **Actions** ➔ Nhấn **New repository secret**.
-3. Thêm 3 secret:
+1. Fork or push this repository to your personal GitHub account.
+2. Navigate to **Settings** ➔ **Secrets and variables** ➔ **Actions** ➔ Click **New repository secret**.
+3. Add the 3 secrets:
    * `TELEGRAM_BOT_TOKEN`
    * `TELEGRAM_CHAT_ID`
    * `GEMINI_API_KEY`
-4. **Xong!** Bot sẽ tự động chạy vào lúc **07:15 AM (Giờ Việt Nam)** hàng ngày. Bạn cũng có thể vào tab **Actions** ➔ Chọn **Daily News Aggregator Bot** ➔ Bấm **Run workflow** để bot gửi tin tức ngay lập tức bất cứ lúc nào.
+4. **Done!** The bot runs automatically every morning at **07:15 AM (UTC+7)**. You can also trigger it manually at any time by going to the **Actions** tab ➔ **Daily News Aggregator Bot** ➔ **Run workflow**.
 
 ---
 
-## 🎯 Tùy Biến Nguồn Báo (`config.json`)
+## 🎯 Customizing News Sources (`config.json`)
 
-Bạn có thể chỉnh sửa file `src/main/resources/config.json` để thêm bớt các đầu báo yêu thích:
+To add or remove news publishers, simply update `src/main/resources/config.json`:
 
 ```json
 {
@@ -128,3 +128,9 @@ Bạn có thể chỉnh sửa file `src/main/resources/config.json` để thêm 
   ]
 }
 ```
+
+---
+
+## 📜 License
+
+This is an open-source pet project distributed under the [MIT License](LICENSE). Feel free to adapt and customize it for your personal daily news digest!
