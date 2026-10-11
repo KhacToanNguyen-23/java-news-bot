@@ -1,10 +1,10 @@
-#  Daily News Telegram Bot (Pet Project)
+# Daily News Telegram Bot (Pet Project)
 
 > **A personal automation tool** that aggregates daily breaking news from global and Vietnamese publishers, analyzes them using **Google Gemini AI** (dual English & Vietnamese summaries, expert insights, and critical questions), and delivers a neat morning briefing straight to Telegram every day at **$0 hosting cost** via GitHub Actions.
 
 ---
 
-##  Showcase & Results (Demo)
+## Showcase & Results (Demo)
 
 Each morning, a formatted report is sent directly to Telegram with clean separation, bilingual summaries, analytical questions, and market predictions:
 
@@ -14,7 +14,7 @@ Each morning, a formatted report is sent directly to Telegram with clean separat
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 * **Language & Runtime:** **Java 17 (LTS)** managed with **Apache Maven**.
 * **AI Engine:** **Google Gemini API** (`gemini-3.6-flash`) for deep text analysis, 8–12 sentence analytical summaries, market foresight, and critical question generation.
@@ -54,7 +54,7 @@ newspaper/
 
 ---
 
-## ⚙️ Installation & Usage Guide
+## Installation & Usage Guide
 
 ### 1. Prerequisites & API Credentials
 You need three credentials:
@@ -131,6 +131,6 @@ To add or remove news publishers, simply update `src/main/resources/config.json`
 
 ---
 
-## 📜 License
+## License
 
 This is an open-source pet project distributed under the [MIT License](LICENSE). Feel free to adapt and customize it for your personal daily news digest!
